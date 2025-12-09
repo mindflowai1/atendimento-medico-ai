@@ -13,9 +13,7 @@
             const currentPath = window.location.pathname;
             const search = window.location.search;
             const hash = window.location.hash;
-
-            // Check if we have an OAuth code (from Google/Supabase redirect)
-            const hasOAuthCode = search.includes('code=');
+            const basePath = '/atendimento-medico-ai';
 
             // Check if we're at a root path that should be in the subpath
             const needsRedirect = (
@@ -26,14 +24,15 @@
 
             // If we need to redirect, add the base path
             if (needsRedirect) {
-                const correctPath = '/atendimento-medico-ai' + currentPath + search + hash;
+                const correctPath = basePath + currentPath + search + hash;
                 console.log('🔄 404 Handler: Redirecting to correct path:', correctPath);
                 window.location.replace(correctPath);
-            } else {
-                // For other 404s, redirect to home
+            } else if (!currentPath.startsWith(basePath)) {
+                // For other 404s not in our app, redirect to home
                 console.log('🏠 404 Handler: Redirecting to home');
-                window.location.replace('/atendimento-medico-ai/');
+                window.location.replace(basePath + '/');
             }
+            // If path already has basePath, do nothing (let React Router handle it)
         })();
     </script>
 </head>
