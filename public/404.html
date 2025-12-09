@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecionando...</title>
+    <script>
+        // GitHub Pages 404 Redirect Handler
+        // This script runs BEFORE React loads to fix OAuth redirect issues
+
+        (function () {
+            const currentPath = window.location.pathname;
+            const search = window.location.search;
+            const hash = window.location.hash;
+
+            // Check if we have an OAuth code (from Google/Supabase redirect)
+            const hasOAuthCode = search.includes('code=');
+
+            // Check if we're at a root path that should be in the subpath
+            const needsRedirect = (
+                currentPath === '/dashboard' ||
+                currentPath === '/login' ||
+                currentPath === '/conectar'
+            );
+
+            // If we need to redirect, add the base path
+            if (needsRedirect) {
+                const correctPath = '/atendimento-medico-ai' + currentPath + search + hash;
+                console.log('🔄 404 Handler: Redirecting to correct path:', correctPath);
+                window.location.replace(correctPath);
+            } else {
+                // For other 404s, redirect to home
+                console.log('🏠 404 Handler: Redirecting to home');
+                window.location.replace('/atendimento-medico-ai/');
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <div
+        style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #0f172a; color: #cbd5e1; font-family: system-ui, -apple-system, sans-serif;">
+        <div style="text-align: center;">
+            <h1 style="font-size: 2rem; margin-bottom: 1rem;">Redirecionando...</h1>
+            <p style="color: #64748b;">Você será redirecionado automaticamente.</p>
+        </div>
+    </div>
+</body>
+
+</html>
