@@ -31,14 +31,17 @@ const LoginPage = () => {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: `${window.location.origin}${import.meta.env.BASE_URL}dashboard`,
-                    scopes: 'https://www.googleapis.com/auth/calendar',
-                    queryParams: {
-                        access_type: 'offline',
-                        prompt: 'consent',
+                    options: {
+                        redirectTo: window.location.hostname === 'mindflowai1.github.io'
+                            ? 'https://mindflowai1.github.io/atendimento-medico-ai/dashboard'
+                            : `${window.location.origin}/dashboard`,
+                        scopes: 'https://www.googleapis.com/auth/calendar',
+                        queryParams: {
+                            access_type: 'offline',
+                            prompt: 'consent',
+                        },
                     },
-                },
-            });
+                });
 
             if (error) throw error;
         } catch (error) {
