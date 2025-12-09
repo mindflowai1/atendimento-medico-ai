@@ -20,6 +20,7 @@ import ConfiguracoesPage from './pages/ConfiguracoesPage';
 import LoginPage from './pages/LoginPage';
 import LoginSection from './components/LoginSection';
 import ProtectedRoute from './components/ProtectedRoute';
+import RedirectHandler from './components/RedirectHandler';
 
 const LandingPage = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -44,6 +45,7 @@ const LandingPage = () => {
 function App() {
   return (
     <Router basename={import.meta.env.BASE_URL}>
+      <RedirectHandler />
       <div className="bg-slate-950 min-h-screen text-slate-200 font-sans selection:bg-primary selection:text-white">
         <Routes>
           {/* Public Routes */}
