@@ -61,46 +61,29 @@ const LoginPage = () => {
                 className="max-w-md w-full bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl p-8 relative z-10 text-center"
             >
                 {/* Logo */}
-                <Link to="/" className="inline-block mb-8 hover:opacity-80 transition-opacity">
-                    <img src={logo} alt="Warley Logo" className="h-20 mx-auto" />
-                </Link>
-
-                <div className="mb-8">
-                    <h2 className="text-3xl font-bold bg-gradient-to-r from-primary-light to-secondary-light bg-clip-text text-transparent mb-2">
-                        Bem-vindo ao Warley
-                    </h2>
-                    <p className="text-slate-400">Faça login para gerenciar sua clínica</p>
-                </div>
-
-                <button
-                    onClick={handleGoogleLogin}
-                    disabled={loading}
-                    className="w-full bg-white hover:bg-slate-100 text-slate-900 font-bold py-4 rounded-xl shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 group disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                    {loading ? (
-                        <>
-                            <Loader2 className="animate-spin h-5 w-5 text-slate-600" />
-                            <span>Redirecionando...</span>
-                        </>
-                    ) : (
-                        <>
-                            <img
-                                src="https://www.google.com/favicon.ico"
-                                alt="Google"
-                                className="w-5 h-5"
-                            />
-                            <span>Entrar com Google</span>
-                            <ArrowRight className="h-5 w-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
-                        </>
+                <>
+                    <Loader2 className="animate-spin h-5 w-5 text-slate-600" />
+                    <span>Redirecionando...</span>
+                </>
+                ) : (
+                <>
+                    <img
+                        src="https://www.google.com/favicon.ico"
+                        alt="Google"
+                        className="w-5 h-5"
+                    />
+                    <span>Entrar com Google</span>
+                    <ArrowRight className="h-5 w-5 text-slate-400 group-hover:translate-x-1 transition-transform" />
+                </>
                     )}
-                </button>
+            </button>
 
-                <div className="mt-8 text-sm text-slate-500 space-y-2">
-                    <p>Ao entrar, você autoriza o acesso à sua agenda para sincronização automática.</p>
-                    <p className="text-xs text-slate-600">Voltando para o início em {timeLeft}s...</p>
-                </div>
-            </motion.div>
-        </div>
+            <div className="mt-8 text-sm text-slate-500 space-y-2">
+                <p>Ao entrar, você autoriza o acesso à sua agenda para sincronização automática.</p>
+                <p className="text-xs text-slate-600">Voltando para o início em {timeLeft}s...</p>
+            </div>
+        </motion.div>
+        </div >
     );
 };
 
