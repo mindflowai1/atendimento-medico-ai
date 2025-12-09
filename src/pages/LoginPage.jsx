@@ -108,7 +108,7 @@ const LoginPage = () => {
                     <p className="text-xs text-slate-600">Voltando para o início em {timeLeft}s...</p>
                 </div>
             </motion.div>
-        </div >
+        </div>
     );
 };
 
