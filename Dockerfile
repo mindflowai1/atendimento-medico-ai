@@ -14,11 +14,11 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build arguments for environment variables
-ARG VITE_SUPABASE_URL
-ARG VITE_SUPABASE_ANON_KEY
-ARG VITE_EVOLUTION_API_URL
-ARG VITE_EVOLUTION_API_KEY
+# Build arguments for environment variables (with defaults for auto-build)
+ARG VITE_SUPABASE_URL=https://yibxoxqhwhfqsktuwaeq.supabase.co
+ARG VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpYnhveHFod2hmcXNrdHV3YWVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyMDE0NjgsImV4cCI6MjA4MDc3NzQ2OH0.Dm5KhvYpXnOopeHVpQ_bTPGQ3I57xaUpFcyn2gItrFw
+ARG VITE_EVOLUTION_API_URL=https://n8n-evolution.kof6cn.easypanel.host
+ARG VITE_EVOLUTION_API_KEY=qwSYwLlijZOh+FaBHrK0tfGzxG6W/J4O
 
 # Set environment variables for build
 ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
