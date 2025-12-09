@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig(({ command }) => {
   const config = {
     plugins: [react()],
-    base: command === 'serve' ? '/' : '/atendimento-medico-ai/',
+    base: '/', // Always use root path for Cloud Run
   }
   return config
 })
