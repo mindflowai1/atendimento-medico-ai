@@ -23,7 +23,7 @@ export const apiService = {
      * @returns {Promise<Object>} - The created instance data
      */
     async createInstance(instanceName) {
-        const WEBHOOK_URL = "https://n8n-n8n-start.kof6cn.easypanel.host/webhook/c95a71fd-1c44-4370-86c6-b24bee1ae69c";
+        const WEBHOOK_URL = "https://n8n-n8n-start.kof6cn.easypanel.host/webhook/f6ccb652-8070-4718-aba7-0c6f00a0f927";
 
         try {
             // Create Instance with Webhook Configuration
@@ -45,10 +45,8 @@ export const apiService = {
                         byEvents: false,
                         base64: false,
                         events: [
-                            "QRCODE_UPDATED",
                             "MESSAGES_UPSERT",
-                            "MESSAGES_UPDATE",
-                            "CONNECTION_UPDATE"
+                            "SEND_MESSAGE"
                         ]
                     }
                 })
