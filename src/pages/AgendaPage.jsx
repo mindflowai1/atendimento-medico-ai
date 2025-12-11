@@ -397,6 +397,8 @@ const AgendaPage = () => {
 
     // ...
 
+    const groupedEvents = getGroupedEvents();
+
     return (
         // ... (render remains mostly same until dayEvents filter)
         <div className="space-y-6 h-[calc(100vh-140px)] flex flex-col">
