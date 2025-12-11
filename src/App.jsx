@@ -19,6 +19,7 @@ import AgendaPage from './pages/AgendaPage';
 import ConfiguracoesPage from './pages/ConfiguracoesPage';
 import LoginPage from './pages/LoginPage';
 import LoginSection from './components/LoginSection';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const LandingPage = () => {
@@ -50,6 +51,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/conectar" element={<ConnectionPage />} />
+          <Route path="/privacidade" element={<PrivacyPolicyPage />} />
 
 
           {/* Protected Dashboard Routes */}
