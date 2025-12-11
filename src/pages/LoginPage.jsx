@@ -99,6 +99,13 @@ const LoginPage = () => {
 
                 <div className="mt-8 text-sm text-slate-500 space-y-2">
                     <p>Ao entrar, você autoriza o acesso à sua agenda para sincronização automática.</p>
+
+                    <div className="pt-2">
+                        <Link to="/privacidade" className="text-xs text-slate-400 hover:text-primary transition-colors underline decoration-slate-800 hover:decoration-primary underline-offset-4">
+                            Política de Privacidade
+                        </Link>
+                    </div>
+
                     <p className="text-xs text-slate-600">Voltando para o início em {timeLeft}s...</p>
                 </div>
             </motion.div>

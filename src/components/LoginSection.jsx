@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Loader2, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 const LoginSection = ({ isOpen, onClose }) => {
@@ -84,6 +85,10 @@ const LoginSection = ({ isOpen, onClose }) => {
 
                                 <p className="text-center text-xs text-slate-500 mt-4 px-4">
                                     Ao entrar, você será redirecionado para o login seguro do Google e autorizará o acesso à sua agenda.
+                                    <br />
+                                    <Link to="/privacidade" className="inline-block mt-2 text-primary hover:text-primary-light underline decoration-slate-800 hover:decoration-primary transition-colors">
+                                        Política de Privacidade
+                                    </Link>
                                 </p>
                             </div>
                         </div>
