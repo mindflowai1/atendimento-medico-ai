@@ -72,13 +72,7 @@ const LoginPage = () => {
                     <p className="text-slate-400">Faça login para gerenciar sua clínica</p>
                 </div>
 
-                {/* Debug Info */}
-                <div className="mb-6 p-3 bg-black/40 rounded-lg border border-slate-800 text-xs text-slate-500 font-mono text-left break-all">
-                    <p className="font-bold text-slate-400 mb-1">Debug Info:</p>
-                    <p>Origin: {window.location.origin}</p>
-                    <p>Base: {import.meta.env.BASE_URL}</p>
-                    <p>Redirect: {`${window.location.origin}${import.meta.env.BASE_URL}dashboard`}</p>
-                </div>
+
 
                 <button
                     onClick={handleGoogleLogin}
