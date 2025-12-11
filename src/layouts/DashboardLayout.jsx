@@ -310,6 +310,8 @@ const DashboardLayout = () => {
                         <p>
                             &copy; 2025 Warley AI.
                             <NavLink to="/privacidade" className="ml-4 hover:text-slate-400 transition-colors">Política de Privacidade</NavLink>
+                            <span className="mx-2">|</span>
+                            <NavLink to="/termos" className="hover:text-slate-400 transition-colors">Termos de Uso</NavLink>
                         </p>
                     </footer>
                 </main>

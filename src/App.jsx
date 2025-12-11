@@ -20,7 +20,8 @@ import ConfiguracoesPage from './pages/ConfiguracoesPage';
 import LoginPage from './pages/LoginPage';
 import LoginSection from './components/LoginSection';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
-import ProtectedRoute from './components/ProtectedRoute';
+import TermsOfUsePage from './pages/TermsOfUsePage';
+import ScrollToTop from './components/ScrollToTop';
 
 const LandingPage = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -45,6 +46,7 @@ const LandingPage = () => {
 function App() {
   return (
     <Router basename={import.meta.env.BASE_URL}>
+      <ScrollToTop />
       <div className="bg-slate-950 min-h-screen text-slate-200 font-sans selection:bg-primary selection:text-white">
         <Routes>
           {/* Public Routes */}
@@ -52,6 +54,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/conectar" element={<ConnectionPage />} />
           <Route path="/privacidade" element={<PrivacyPolicyPage />} />
+          <Route path="/termos" element={<TermsOfUsePage />} />
 
 
           {/* Protected Dashboard Routes */}
