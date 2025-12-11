@@ -503,303 +503,303 @@ const AgendaPage = () => {
                                 setIsLoading(false);
                             }
                         }}
-                        }}
-                    className="px-4 py-2 mr-4 bg-primary hover:bg-primary-light text-white rounded-xl shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 active:scale-95 flex items-center gap-2 font-semibold text-xs uppercase tracking-wide group"
-                    title="Criar Nova Agenda"
-                    >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus group-hover:rotate-90 transition-transform duration-300"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
-                    <span>Nova Agenda</span>
-                </button>
 
-                <div className="flex bg-slate-800/50 rounded-lg p-0.5 border border-slate-800">
-                    <button
-                        onClick={() => setViewMode('list')}
-                        className={`p-1.5 rounded-md transition-all flex items-center gap-2 text-xs font-medium ${viewMode === 'list' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                        className="px-4 py-2 mr-4 bg-primary hover:bg-primary-light text-white rounded-xl shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 active:scale-95 flex items-center gap-2 font-semibold text-xs uppercase tracking-wide group"
+                        title="Criar Nova Agenda"
                     >
-                        <LayoutList className="w-3.5 h-3.5" />
-                        Lista
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus group-hover:rotate-90 transition-transform duration-300"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
+                        <span>Nova Agenda</span>
                     </button>
+
+                    <div className="flex bg-slate-800/50 rounded-lg p-0.5 border border-slate-800">
+                        <button
+                            onClick={() => setViewMode('list')}
+                            className={`p-1.5 rounded-md transition-all flex items-center gap-2 text-xs font-medium ${viewMode === 'list' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                        >
+                            <LayoutList className="w-3.5 h-3.5" />
+                            Lista
+                        </button>
+                        <button
+                            onClick={() => setViewMode('week')}
+                            className={`p-1.5 rounded-md transition-all flex items-center gap-2 text-xs font-medium ${viewMode === 'week' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                        >
+                            <LayoutGrid className="w-3.5 h-3.5" />
+                            Semana
+                        </button>
+                    </div>
+
                     <button
-                        onClick={() => setViewMode('week')}
-                        className={`p-1.5 rounded-md transition-all flex items-center gap-2 text-xs font-medium ${viewMode === 'week' ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                        onClick={fetchEvents}
+                        className="ml-auto md:ml-2 p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                        title="Atualizar"
                     >
-                        <LayoutGrid className="w-3.5 h-3.5" />
-                        Semana
+                        <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
                     </button>
                 </div>
-
-                <button
-                    onClick={fetchEvents}
-                    className="ml-auto md:ml-2 p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
-                    title="Atualizar"
-                >
-                    <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-                </button>
             </div>
-        </div>
 
             {
-        error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl flex items-center gap-3 shrink-0">
-                <AlertCircle className="w-5 h-5" />
-                {error}
-            </div>
-        )
-    }
+                error && (
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl flex items-center gap-3 shrink-0">
+                        <AlertCircle className="w-5 h-5" />
+                        {error}
+                    </div>
+                )
+            }
 
-    {/* Content Area */ }
-    <div className="flex-1 min-h-0 bg-slate-900/30 border border-slate-800 rounded-xl overflow-hidden relative">
+            {/* Content Area */}
+            <div className="flex-1 min-h-0 bg-slate-900/30 border border-slate-800 rounded-xl overflow-hidden relative">
 
-        {viewMode === 'list' ? (
-            <div className="h-full overflow-y-auto p-6 space-y-10 relative">
-                {/* Background Gradients for Aesthetics */}
-                <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 opacity-20">
-                    <div className="absolute top-10 left-10 w-64 h-64 bg-primary/20 rounded-full blur-3xl"></div>
-                    <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
-                </div>
-
-                {events.length === 0 ? (
-                    <div className="text-center py-20 relative z-10">
-                        <div className="inline-flex p-4 rounded-full bg-slate-900/50 border border-slate-800 mb-4 backdrop-blur-sm">
-                            <CalendarIcon className="w-8 h-8 text-slate-500" />
+                {viewMode === 'list' ? (
+                    <div className="h-full overflow-y-auto p-6 space-y-10 relative">
+                        {/* Background Gradients for Aesthetics */}
+                        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 opacity-20">
+                            <div className="absolute top-10 left-10 w-64 h-64 bg-primary/20 rounded-full blur-3xl"></div>
+                            <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
                         </div>
-                        <h3 className="text-xl font-medium text-slate-300">Nenhum compromisso encontrado</h3>
-                        <p className="text-slate-500 mt-1">Sua agenda está livre para este mês.</p>
+
+                        {events.length === 0 ? (
+                            <div className="text-center py-20 relative z-10">
+                                <div className="inline-flex p-4 rounded-full bg-slate-900/50 border border-slate-800 mb-4 backdrop-blur-sm">
+                                    <CalendarIcon className="w-8 h-8 text-slate-500" />
+                                </div>
+                                <h3 className="text-xl font-medium text-slate-300">Nenhum compromisso encontrado</h3>
+                                <p className="text-slate-500 mt-1">Sua agenda está livre para este mês.</p>
+                            </div>
+                        ) : (
+                            <div className="relative z-10 space-y-10">
+                                <div className="relative z-10 space-y-12 pb-20">
+                                    {/* Today's Events - Highlighted */}
+                                    {groupedEvents.today.length > 0 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.5 }}
+                                            className="space-y-6"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="p-2 bg-primary/20 rounded-lg border border-primary/30 text-primary">
+                                                    <CalendarIcon className="w-6 h-6" />
+                                                </div>
+                                                <h2 className="text-2xl font-bold text-white tracking-tight">Eventos Hoje</h2>
+                                                <div className="h-px flex-1 bg-gradient-to-r from-primary/50 to-transparent"></div>
+                                            </div>
+                                            <div className="grid gap-4">
+                                                {groupedEvents.today.map((e, index) => (
+                                                    <motion.div
+                                                        key={e.id}
+                                                        initial={{ opacity: 0, x: -20 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        transition={{ delay: index * 0.1 }}
+                                                    >
+                                                        {renderMagicCard(e, 'today')}
+                                                    </motion.div>
+                                                ))}
+                                            </div>
+                                        </motion.div>
+                                    )}
+
+                                    {/* Upcoming Events */}
+                                    {groupedEvents.upcoming.length > 0 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 30 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.5, delay: 0.2 }}
+                                            className="space-y-6"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20 text-blue-400">
+                                                    <Clock className="w-6 h-6" />
+                                                </div>
+                                                <h2 className="text-xl font-bold text-slate-200 tracking-tight">Próximos Eventos</h2>
+                                                <div className="h-px flex-1 bg-gradient-to-r from-blue-500/30 to-transparent"></div>
+                                            </div>
+                                            <div className="grid gap-4">
+                                                {groupedEvents.upcoming.map((e, index) => (
+                                                    <motion.div
+                                                        key={e.id}
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: 1 }}
+                                                        transition={{ delay: 0.3 + (index * 0.05) }}
+                                                    >
+                                                        {renderMagicCard(e, 'upcoming')}
+                                                    </motion.div>
+                                                ))}
+                                            </div>
+                                        </motion.div>
+                                    )}
+
+
+                                    {/* Past Events - Collapsible & Red Theme */}
+                                    {groupedEvents.past.length > 0 && (
+                                        <motion.div
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ duration: 0.8, delay: 0.5 }}
+                                            className="space-y-4 pt-8 border-t border-slate-800/50"
+                                        >
+                                            <button
+                                                onClick={() => setShowPastEvents(!showPastEvents)}
+                                                className="w-full flex items-center gap-4 opacity-80 hover:opacity-100 transition-opacity group"
+                                            >
+                                                <div className="p-2 bg-red-500/10 rounded-lg border border-red-500/20 text-red-400 group-hover:bg-red-500/20 transition-colors">
+                                                    <RefreshCw className={`w-5 h-5 transition-transform duration-500 ${showPastEvents ? 'rotate-180' : ''}`} />
+                                                </div>
+                                                <h2 className="text-lg font-semibold text-red-200/80 tracking-tight group-hover:text-red-200">
+                                                    Eventos Passados ({groupedEvents.past.length})
+                                                </h2>
+                                                <div className="h-px flex-1 bg-gradient-to-r from-red-500/20 to-transparent"></div>
+                                                <ChevronRight className={`w-5 h-5 text-red-400/50 transition-transform duration-300 ${showPastEvents ? 'rotate-90' : ''}`} />
+                                            </button>
+
+                                            <AnimatePresence>
+                                                {showPastEvents && (
+                                                    <motion.div
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: 'auto', opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                                        className="overflow-hidden"
+                                                    >
+                                                        <div className="grid gap-4 pt-2 opacity-80">
+                                                            {groupedEvents.past.map(e => renderMagicCard(e, 'past'))}
+                                                        </div>
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </motion.div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 ) : (
-                    <div className="relative z-10 space-y-10">
-                        <div className="relative z-10 space-y-12 pb-20">
-                            {/* Today's Events - Highlighted */}
-                            {groupedEvents.today.length > 0 && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.5 }}
-                                    className="space-y-6"
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-2 bg-primary/20 rounded-lg border border-primary/30 text-primary">
-                                            <CalendarIcon className="w-6 h-6" />
-                                        </div>
-                                        <h2 className="text-2xl font-bold text-white tracking-tight">Eventos Hoje</h2>
-                                        <div className="h-px flex-1 bg-gradient-to-r from-primary/50 to-transparent"></div>
-                                    </div>
-                                    <div className="grid gap-4">
-                                        {groupedEvents.today.map((e, index) => (
-                                            <motion.div
-                                                key={e.id}
-                                                initial={{ opacity: 0, x: -20 }}
-                                                animate={{ opacity: 1, x: 0 }}
-                                                transition={{ delay: index * 0.1 }}
-                                            >
-                                                {renderMagicCard(e, 'today')}
-                                            </motion.div>
-                                        ))}
-                                    </div>
-                                </motion.div>
-                            )}
-
-                            {/* Upcoming Events */}
-                            {groupedEvents.upcoming.length > 0 && (
-                                <motion.div
-                                    initial={{ opacity: 0, y: 30 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.5, delay: 0.2 }}
-                                    className="space-y-6"
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20 text-blue-400">
-                                            <Clock className="w-6 h-6" />
-                                        </div>
-                                        <h2 className="text-xl font-bold text-slate-200 tracking-tight">Próximos Eventos</h2>
-                                        <div className="h-px flex-1 bg-gradient-to-r from-blue-500/30 to-transparent"></div>
-                                    </div>
-                                    <div className="grid gap-4">
-                                        {groupedEvents.upcoming.map((e, index) => (
-                                            <motion.div
-                                                key={e.id}
-                                                initial={{ opacity: 0 }}
-                                                animate={{ opacity: 1 }}
-                                                transition={{ delay: 0.3 + (index * 0.05) }}
-                                            >
-                                                {renderMagicCard(e, 'upcoming')}
-                                            </motion.div>
-                                        ))}
-                                    </div>
-                                </motion.div>
-                            )}
-
-
-                            {/* Past Events - Collapsible & Red Theme */}
-                            {groupedEvents.past.length > 0 && (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ duration: 0.8, delay: 0.5 }}
-                                    className="space-y-4 pt-8 border-t border-slate-800/50"
-                                >
-                                    <button
-                                        onClick={() => setShowPastEvents(!showPastEvents)}
-                                        className="w-full flex items-center gap-4 opacity-80 hover:opacity-100 transition-opacity group"
-                                    >
-                                        <div className="p-2 bg-red-500/10 rounded-lg border border-red-500/20 text-red-400 group-hover:bg-red-500/20 transition-colors">
-                                            <RefreshCw className={`w-5 h-5 transition-transform duration-500 ${showPastEvents ? 'rotate-180' : ''}`} />
-                                        </div>
-                                        <h2 className="text-lg font-semibold text-red-200/80 tracking-tight group-hover:text-red-200">
-                                            Eventos Passados ({groupedEvents.past.length})
-                                        </h2>
-                                        <div className="h-px flex-1 bg-gradient-to-r from-red-500/20 to-transparent"></div>
-                                        <ChevronRight className={`w-5 h-5 text-red-400/50 transition-transform duration-300 ${showPastEvents ? 'rotate-90' : ''}`} />
-                                    </button>
-
-                                    <AnimatePresence>
-                                        {showPastEvents && (
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: 'auto', opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                transition={{ duration: 0.3, ease: 'easeInOut' }}
-                                                className="overflow-hidden"
-                                            >
-                                                <div className="grid gap-4 pt-2 opacity-80">
-                                                    {groupedEvents.past.map(e => renderMagicCard(e, 'past'))}
-                                                </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </motion.div>
-                            )}
-                        </div>
-                    </div>
-                )}
-            </div>
-        ) : (
-            <div className="h-full flex flex-col">
-                {/* Header Days */}
-                <div className="grid grid-cols-8 border-b border-slate-800 bg-slate-900/50 shrink-0">
-                    <div className="p-3 border-r border-slate-800 text-xs text-slate-500 font-medium text-center py-4">
-                        Hora
-                    </div>
-                    {weekDays.map((day, i) => (
-                        <div key={i} className={`p-3 border-r border-slate-800 last:border-0 text-center ${isToday(day) ? 'bg-primary/5' : ''}`}>
-                            <div className={`text-xs uppercase mb-1 font-medium ${isToday(day) ? 'text-primary' : 'text-slate-500'}`}>
-                                {new Intl.DateTimeFormat('pt-BR', { weekday: 'short' }).format(day)}
+                    <div className="h-full flex flex-col">
+                        {/* Header Days */}
+                        <div className="grid grid-cols-8 border-b border-slate-800 bg-slate-900/50 shrink-0">
+                            <div className="p-3 border-r border-slate-800 text-xs text-slate-500 font-medium text-center py-4">
+                                Hora
                             </div>
-                            <div className={`text-lg font-bold ${isToday(day) ? 'text-primary' : 'text-white'}`}>
-                                {day.getDate()}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Grid Scroll Area */}
-                <div ref={scrollRef} className="flex-1 overflow-y-auto relative no-scrollbar">
-                    <div className="grid grid-cols-8 min-h-[600px] relative">
-                        {/* Time Column */}
-                        <div className="border-r border-slate-800 bg-slate-900/20">
-                            {Array.from({ length: 24 }).map((_, hour) => (
-                                <div key={hour} className="h-20 border-b border-slate-800 text-xs text-slate-500 text-right pr-2 pt-2 relative">
-                                    {hour.toString().padStart(2, '0')}:00
+                            {weekDays.map((day, i) => (
+                                <div key={i} className={`p-3 border-r border-slate-800 last:border-0 text-center ${isToday(day) ? 'bg-primary/5' : ''}`}>
+                                    <div className={`text-xs uppercase mb-1 font-medium ${isToday(day) ? 'text-primary' : 'text-slate-500'}`}>
+                                        {new Intl.DateTimeFormat('pt-BR', { weekday: 'short' }).format(day)}
+                                    </div>
+                                    <div className={`text-lg font-bold ${isToday(day) ? 'text-primary' : 'text-white'}`}>
+                                        {day.getDate()}
+                                    </div>
                                 </div>
                             ))}
                         </div>
 
-                        {/* Days Columns */}
-                        {weekDays.map((day, dayIndex) => {
-                            // Get events for this day
-                            const dayEvents = events.filter(e => {
-                                const dateStr = getStartDate(e);
-                                if (!dateStr) return false;
-
-                                const eDate = new Date(dateStr);
-                                // Fix timezones for all-day events check
-                                if (e.start.date) {
-                                    const [y, m, d] = e.start.date.split('-').map(Number);
-                                    // Simple integer check for safety
-                                    return d === day.getDate() && (m - 1) === day.getMonth() && y === day.getFullYear();
-                                }
-
-                                return eDate.getDate() === day.getDate() &&
-                                    eDate.getMonth() === day.getMonth() &&
-                                    eDate.getFullYear() === day.getFullYear();
-                            });
-
-                            return (
-                                <div key={dayIndex} className="border-r border-slate-800 last:border-0 relative h-[1920px]">
-                                    {/* Grid Lines */}
-                                    {Array.from({ length: 24 }).map((_, h) => (
-                                        <div key={h} className="h-20 border-b border-slate-800/50" />
-                                    ))}
-
-                                    {/* Current Time Indicator (if today) */}
-                                    {isToday(day) && (
-                                        <div
-                                            className="absolute w-full border-t-2 border-red-500 z-20 pointer-events-none"
-                                            style={{
-                                                top: `${(new Date().getHours() * 60 + new Date().getMinutes()) / (24 * 60) * 100}%`
-                                            }}
-                                        >
-                                            <div className="w-2 h-2 bg-red-500 rounded-full -mt-[5px] -ml-[5px]" />
+                        {/* Grid Scroll Area */}
+                        <div ref={scrollRef} className="flex-1 overflow-y-auto relative no-scrollbar">
+                            <div className="grid grid-cols-8 min-h-[600px] relative">
+                                {/* Time Column */}
+                                <div className="border-r border-slate-800 bg-slate-900/20">
+                                    {Array.from({ length: 24 }).map((_, hour) => (
+                                        <div key={hour} className="h-20 border-b border-slate-800 text-xs text-slate-500 text-right pr-2 pt-2 relative">
+                                            {hour.toString().padStart(2, '0')}:00
                                         </div>
-                                    )}
+                                    ))}
+                                </div>
 
-                                    {/* Events */}
-                                    {dayEvents.map(event => {
-                                        const startStr = getStartDate(event);
-                                        const endStr = getEndDate(event);
+                                {/* Days Columns */}
+                                {weekDays.map((day, dayIndex) => {
+                                    // Get events for this day
+                                    const dayEvents = events.filter(e => {
+                                        const dateStr = getStartDate(e);
+                                        if (!dateStr) return false;
 
-                                        const start = new Date(startStr);
-                                        const end = new Date(endStr);
-
-                                        // Default for all-day
-                                        let topPercent = 0;
-                                        let heightPercent = 100;
-
-                                        if (!event.start.date) {
-                                            const startMinutes = start.getHours() * 60 + start.getMinutes();
-                                            const durationMinutes = (end - start) / (1000 * 60);
-                                            topPercent = (startMinutes / 1440) * 100;
-                                            heightPercent = (durationMinutes / 1440) * 100;
+                                        const eDate = new Date(dateStr);
+                                        // Fix timezones for all-day events check
+                                        if (e.start.date) {
+                                            const [y, m, d] = e.start.date.split('-').map(Number);
+                                            // Simple integer check for safety
+                                            return d === day.getDate() && (m - 1) === day.getMonth() && y === day.getFullYear();
                                         }
 
-                                        return (
-                                            <div
-                                                key={event.id}
-                                                className={`absolute inset-x-1 rounded-md bg-primary/20 border border-primary/40 p-1 text-xs overflow-hidden hover:z-10 hover:bg-primary/30 transition-colors cursor-pointer ${event.start.date ? 'bg-purple-500/20 border-purple-500/40 text-purple-200' : ''}`}
-                                                style={{
-                                                    top: event.start.date ? '0px' : `${topPercent}%`,
-                                                    height: event.start.date ? '20px' : `${Math.max(heightPercent, 2.5)}%`, // All day = small strip at top or full block? Usually a strip.
-                                                    position: event.start.date ? 'static' : 'absolute' // Stack all day events
-                                                }}
-                                                title={`${event.summary}\n${event.start.date ? 'Dia Inteiro' : formatTime(startStr) + ' - ' + formatTime(endStr)}`}
-                                            >
-                                                <div className="font-semibold truncate">
-                                                    {event.summary || '(Sem título)'}
+                                        return eDate.getDate() === day.getDate() &&
+                                            eDate.getMonth() === day.getMonth() &&
+                                            eDate.getFullYear() === day.getFullYear();
+                                    });
+
+                                    return (
+                                        <div key={dayIndex} className="border-r border-slate-800 last:border-0 relative h-[1920px]">
+                                            {/* Grid Lines */}
+                                            {Array.from({ length: 24 }).map((_, h) => (
+                                                <div key={h} className="h-20 border-b border-slate-800/50" />
+                                            ))}
+
+                                            {/* Current Time Indicator (if today) */}
+                                            {isToday(day) && (
+                                                <div
+                                                    className="absolute w-full border-t-2 border-red-500 z-20 pointer-events-none"
+                                                    style={{
+                                                        top: `${(new Date().getHours() * 60 + new Date().getMinutes()) / (24 * 60) * 100}%`
+                                                    }}
+                                                >
+                                                    <div className="w-2 h-2 bg-red-500 rounded-full -mt-[5px] -ml-[5px]" />
                                                 </div>
-                                                {!event.start.date && (
-                                                    <div className="text-primary/70 text-[10px]">
-                                                        {formatTime(start)}
+                                            )}
+
+                                            {/* Events */}
+                                            {dayEvents.map(event => {
+                                                const startStr = getStartDate(event);
+                                                const endStr = getEndDate(event);
+
+                                                const start = new Date(startStr);
+                                                const end = new Date(endStr);
+
+                                                // Default for all-day
+                                                let topPercent = 0;
+                                                let heightPercent = 100;
+
+                                                if (!event.start.date) {
+                                                    const startMinutes = start.getHours() * 60 + start.getMinutes();
+                                                    const durationMinutes = (end - start) / (1000 * 60);
+                                                    topPercent = (startMinutes / 1440) * 100;
+                                                    heightPercent = (durationMinutes / 1440) * 100;
+                                                }
+
+                                                return (
+                                                    <div
+                                                        key={event.id}
+                                                        className={`absolute inset-x-1 rounded-md bg-primary/20 border border-primary/40 p-1 text-xs overflow-hidden hover:z-10 hover:bg-primary/30 transition-colors cursor-pointer ${event.start.date ? 'bg-purple-500/20 border-purple-500/40 text-purple-200' : ''}`}
+                                                        style={{
+                                                            top: event.start.date ? '0px' : `${topPercent}%`,
+                                                            height: event.start.date ? '20px' : `${Math.max(heightPercent, 2.5)}%`, // All day = small strip at top or full block? Usually a strip.
+                                                            position: event.start.date ? 'static' : 'absolute' // Stack all day events
+                                                        }}
+                                                        title={`${event.summary}\n${event.start.date ? 'Dia Inteiro' : formatTime(startStr) + ' - ' + formatTime(endStr)}`}
+                                                    >
+                                                        <div className="font-semibold truncate">
+                                                            {event.summary || '(Sem título)'}
+                                                        </div>
+                                                        {!event.start.date && (
+                                                            <div className="text-primary/70 text-[10px]">
+                                                                {formatTime(start)}
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            );
-                        })}
+                                                );
+                                            })}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
-        )}
-    </div>
         </div >
     );
 
-function formatTime(date) {
-    if (!date) return '';
-    if (typeof date === 'string') date = new Date(date);
-    return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(date);
-}
+    function formatTime(date) {
+        if (!date) return '';
+        if (typeof date === 'string') date = new Date(date);
+        return new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(date);
+    }
 };
 
 export default AgendaPage;
