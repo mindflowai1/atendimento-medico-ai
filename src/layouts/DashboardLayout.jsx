@@ -299,8 +299,21 @@ const DashboardLayout = () => {
                 </header>
 
                 {/* Page Content Scrollable Area */}
-                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-950 p-6 lg:p-8">
-                    <Outlet />
+                {/* Page Content Scrollable Area */}
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-950 p-6 lg:p-8 flex flex-col">
+                    <div className="flex-1">
+                        <Outlet />
+                    </div>
+
+                    {/* Dashboard Footer */}
+                    <footer className="mt-12 pt-6 border-t border-slate-900 text-center text-xs text-slate-600">
+                        <p>
+                            &copy; {new Date().getFullYear()} Warley AI.
+                            <NavLink to="/privacidade" className="ml-4 hover:text-slate-400 transition-colors">Política de Privacidade</NavLink>
+                            <span className="mx-2">|</span>
+                            <a href="#" className="hover:text-slate-400 transition-colors">Termos de Uso</a>
+                        </p>
+                    </footer>
                 </main>
             </div>
         </div>
