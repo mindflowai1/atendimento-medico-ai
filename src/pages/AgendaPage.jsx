@@ -440,13 +440,7 @@ const AgendaPage = () => {
                             <ChevronRight className="w-5 h-5" />
                         </button>
 
-                        <button
-                            onClick={() => setCurrentDate(new Date())}
-                            className="text-xs font-medium text-slate-500 hover:text-white ml-2 transition-colors"
-                            title="Voltar para Hoje"
-                        >
-                            Hoje
-                        </button>
+
                     </div>
 
                     {/* Calendar Selector */}
