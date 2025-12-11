@@ -303,6 +303,19 @@ const DashboardLayout = () => {
                 <main className="flex-1 overflow-x-hidden overflow-y-auto bg-slate-950 p-6 lg:p-8 flex flex-col">
                     <div className="flex-1">
                         <Outlet />
+                    </div>
+
+                    {/* Dashboard Footer */}
+                    <footer className="mt-12 pt-6 border-t border-slate-900 text-center text-xs text-slate-600">
+                        <p>
+                            &copy; 2025 Warley AI.
+                            <NavLink to="/privacidade" className="ml-4 hover:text-slate-400 transition-colors">Política de Privacidade</NavLink>
+                        </p>
+                    </footer>
+                </main>
+            </div>
+        </div>
+    );
 };
 
-                        export default DashboardLayout;
+export default DashboardLayout;
