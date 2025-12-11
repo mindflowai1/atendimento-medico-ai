@@ -96,41 +96,6 @@ const AgendaPage = () => {
 
             // Loop Prevention Check
             const isRetry = sessionStorage.getItem('google_auth_retry');
-            if (isRetry) {
-                // ... (existing retry logic comments)
-            }
-
-
-
-            // FORCE REFRESH: User request to regenerate token on every agenda action
-            // This ensures we don't use a stale 1-hour Google Token even if the session exists.
-            console.log("Agenda: Force refreshing session to get fresh Provider Token...");
-            const { data: refreshedData, error: refreshError } = await supabase.auth.refreshSession();
-
-            if (refreshError) {
-                console.error("Agenda: Session force refresh failed:", refreshError);
-                // Fallback to existing session if available, or try normal getSession
-            } else if (refreshedData.session) {
-                session = refreshedData.session;
-                console.log("Agenda: Session refreshed. New Provider Token obtained.");
-            }
-
-            if (!session?.provider_token) {
-                // If still no token after refresh, try one more time or fail
-                const { data: currentSession } = await supabase.auth.getSession();
-                session = currentSession.session;
-            }
-
-            if (!session?.provider_token) {
-                console.warn("Agenda: No provider_token found even after refresh.");
-                setIsConnected(false);
-                return;
-            }
-
-            console.log("Agenda: Token found, fetching events...");
-            setIsConnected(true);
-
-            // Fetch for the entire Month of the currentDate
             const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
             const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59);
 
