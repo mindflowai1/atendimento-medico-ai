@@ -30,7 +30,6 @@ const Footer = () => {
                         <h4 className="text-white font-bold mb-4">Legal</h4>
                         <ul className="space-y-2 text-sm text-slate-400">
                             <li><Link to="/privacidade" className="hover:text-primary transition-colors">Termos de Privacidade (LGPD)</Link></li>
-                            <li><a href="#" className="hover:text-primary transition-colors">Termos de Uso</a></li>
                         </ul>
                     </div>
 
@@ -45,7 +44,7 @@ const Footer = () => {
 
                 <div className="border-t border-slate-900 pt-8 flex flex-col md:flex-row justify-between items-center">
                     <p className="text-slate-600 text-sm mb-4 md:mb-0">
-                        © 2024 Warley AI Tecnologia Ltda. Todos os direitos reservados.
+                        © 2025 Warley AI Tecnologia Ltda. Todos os direitos reservados.
                     </p>
                     <div className="flex space-x-6">
                         <a href="#" className="text-slate-500 hover:text-white transition-colors"><Instagram className="w-5 h-5" /></a>
