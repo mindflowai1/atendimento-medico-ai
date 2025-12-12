@@ -22,6 +22,7 @@ import LoginSection from './components/LoginSection';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfUsePage from './pages/TermsOfUsePage';
 import ScrollToTop from './components/ScrollToTop';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const LandingPage = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
