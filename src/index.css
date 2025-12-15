@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Inter", sans-serif;
+
+  --color-primary-light: #2dd4bf;
+  /* teal-400 */
+  --color-primary: #0d9488;
+  /* teal-600 */
+  --color-primary-dark: #115e59;
+  /* teal-800 */
+
+  --color-secondary-light: #60a5fa;
+  /* blue-400 */
+  --color-secondary: #2563eb;
+  /* blue-600 */
+  --color-secondary-dark: #1e40af;
+  /* blue-800 */
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes shooting {
+  0% {
+    transform: translateX(0) translateY(0) rotate(-45deg);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  20% {
+    transform: translateX(-400px) translateY(400px) rotate(-45deg);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(-400px) translateY(400px) rotate(-45deg);
+    opacity: 0;
+  }
+}
+
+.shooting-star {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(-45deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+  border-radius: 999px;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 1));
+  animation: shooting 3s ease-in-out infinite;
+}
+
+html {
+  scroll-behavior: smooth;
+}
