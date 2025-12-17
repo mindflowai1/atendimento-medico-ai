@@ -211,6 +211,18 @@ const DashboardLayout = () => {
                             <span>Sair da Conta</span>
                         </button>
                     </div>
+
+                    {/* Sidebar Footer */}
+                    <div className="mt-6 pt-6 border-t border-slate-800/50 text-center">
+                        <p className="text-[10px] text-slate-600 font-medium">
+                            &copy; 2025 Warley AI
+                        </p>
+                        <div className="flex justify-center gap-3 mt-2 text-[10px] text-slate-500">
+                            <NavLink to="/privacidade" className="hover:text-slate-400 transition-colors">Privacidade</NavLink>
+                            <span>•</span>
+                            <NavLink to="/termos" className="hover:text-slate-400 transition-colors">Termos</NavLink>
+                        </div>
+                    </div>
                 </div>
             </aside>
 
@@ -306,14 +318,7 @@ const DashboardLayout = () => {
                     </div>
 
                     {/* Dashboard Footer */}
-                    <footer className="mt-12 pt-6 border-t border-slate-900 text-center text-xs text-slate-600">
-                        <p>
-                            &copy; 2025 Warley AI.
-                            <NavLink to="/privacidade" className="ml-4 hover:text-slate-400 transition-colors">Política de Privacidade</NavLink>
-                            <span className="mx-2">|</span>
-                            <NavLink to="/termos" className="hover:text-slate-400 transition-colors">Termos de Uso</NavLink>
-                        </p>
-                    </footer>
+
                 </main>
             </div>
         </div>

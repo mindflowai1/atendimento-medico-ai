@@ -1,13 +1,91 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import EventModal from '../components/EventModal';
 import CreateCalendarModal from '../components/CreateCalendarModal';
+import CalendarLinkModal from '../components/CalendarLinkModal';
 import {
     Calendar as CalendarIcon, Clock, RefreshCw,
     ChevronLeft, ChevronRight,
-    Menu, Plus, MapPin, Video, ExternalLink, Users
+    Menu, Plus, MapPin, Video, ExternalLink, Users, Link as LinkIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Settings Modal Component
+const SettingsModal = ({ isOpen, onClose, calendar, onLink, onRename, onDelete }) => {
+    if (!isOpen || !calendar) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl"
+            >
+                <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div
+                            className="w-3 h-3 rounded-full shadow-sm ring-2 ring-offset-2 ring-offset-slate-900"
+                            style={{ backgroundColor: calendar.backgroundColor || '#3b82f6' }}
+                        />
+                        <h3 className="text-lg font-bold text-white truncate max-w-[200px]">{calendar.summary}</h3>
+                    </div>
+                    <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div className="p-2 space-y-1">
+                    <button
+                        onClick={() => { onClose(); onLink(calendar); }}
+                        className="w-full p-3 hover:bg-slate-800 rounded-xl flex items-center gap-3 transition-all text-left group"
+                    >
+                        <div className={`p-2 rounded-lg ${calendar.appointment_link ? 'bg-blue-500/10 text-blue-400' : 'bg-slate-800 text-slate-400 group-hover:bg-blue-500/10 group-hover:text-blue-400'}`}>
+                            <LinkIcon className="w-4 h-4" />
+                        </div>
+                        <div>
+                            <p className="font-semibold text-white">Link de Agendamento</p>
+                            <p className="text-xs text-slate-400">{calendar.appointment_link ? 'Configurado' : 'Não configurado'}</p>
+                        </div>
+                    </button>
+
+                    <button
+                        onClick={() => { onClose(); onRename(calendar.id); }}
+                        className="w-full p-3 hover:bg-slate-800 rounded-xl flex items-center gap-3 transition-all text-left group"
+                    >
+                        <div className="p-2 rounded-lg bg-slate-800 text-slate-400 group-hover:bg-indigo-500/10 group-hover:text-indigo-400 transition-colors">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p className="font-semibold text-white">Renomear</p>
+                            <p className="text-xs text-slate-400">Alterar nome da agenda</p>
+                        </div>
+                    </button>
+
+                    {!calendar.primary && (
+                        <button
+                            onClick={() => { onClose(); onDelete(calendar.id); }}
+                            className="w-full p-3 hover:bg-slate-800 rounded-xl flex items-center gap-3 transition-all text-left group"
+                        >
+                            <div className="p-2 rounded-lg bg-slate-800 text-slate-400 group-hover:bg-red-500/10 group-hover:text-red-400 transition-colors">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="font-semibold text-white group-hover:text-red-400 transition-colors">Excluir</p>
+                                <p className="text-xs text-slate-400 group-hover:text-red-400/70 transition-colors">Remover agenda permanentemente</p>
+                            </div>
+                        </button>
+                    )}
+                </div>
+            </motion.div>
+        </div>
+    );
+};
 
 const AgendaPage = () => {
     const [events, setEvents] = useState([]);
@@ -21,6 +99,8 @@ const AgendaPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isEventModalOpen, setIsEventModalOpen] = useState(false);
     const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
+    const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
+    const [selectedCalendarForLink, setSelectedCalendarForLink] = useState(null);
     const [editingEvent, setEditingEvent] = useState(null);
     const [needsGoogleConnect, setNeedsGoogleConnect] = useState(false);
     const [isCreatingCalendar, setIsCreatingCalendar] = useState(false);
@@ -132,7 +212,7 @@ const AgendaPage = () => {
             const token = await getValidToken();
             console.log('fetchCalendars: Got token');
 
-            // Add timestamp to prevent caching
+            // 1. Fetch Google Calendars
             const timestamp = new Date().getTime();
             const res = await fetch(`https://www.googleapis.com/calendar/v3/users/me/calendarList?_=${timestamp}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -143,19 +223,50 @@ const AgendaPage = () => {
             if (res.ok) {
                 const data = await res.json();
                 console.log('fetchCalendars: Got', data.items?.length || 0, 'calendars');
-                let cals = data.items || [];
+                let googleCals = data.items || [];
+
+                // 2. Fetch Supabase Agendas (Metadata like links)
+                const { data: { user } } = await supabase.auth.getUser();
+                let supabaseAgendas = [];
+
+                if (user) {
+                    // Get clinic first
+                    const { data: clinic } = await supabase
+                        .from('clinics')
+                        .select('id')
+                        .eq('owner_id', user.id)
+                        .single();
+
+                    if (clinic) {
+                        const { data: agendas } = await supabase
+                            .from('agendas')
+                            .select('*')
+                            .eq('clinic_id', clinic.id);
+                        supabaseAgendas = agendas || [];
+                    }
+                }
+
+                // 3. Merge Data
+                const mergedCals = googleCals.map(gCal => {
+                    const sbInter = supabaseAgendas.find(sb => sb.google_calendar_id === gCal.id);
+                    return {
+                        ...gCal,
+                        appointment_link: sbInter?.appointment_link || null,
+                        supabase_id: sbInter?.id || null
+                    };
+                });
 
                 // Sort: primary calendar first, then others
-                cals = cals.sort((a, b) => {
+                const sortedCals = mergedCals.sort((a, b) => {
                     if (a.primary) return -1;
                     if (b.primary) return 1;
                     return a.summary.localeCompare(b.summary);
                 });
 
-                setCalendars(cals);
-                if (cals.length > 0 && !selectedCalendar) {
-                    setSelectedCalendar(cals[0].id);
-                    console.log('fetchCalendars: Selected first calendar:', cals[0].summary);
+                setCalendars(sortedCals);
+                if (sortedCals.length > 0 && !selectedCalendar) {
+                    setSelectedCalendar(sortedCals[0].id);
+                    console.log('fetchCalendars: Selected first calendar:', sortedCals[0].summary);
                 }
             } else {
                 const error = await res.text();
@@ -169,6 +280,47 @@ const AgendaPage = () => {
             } else {
                 alert('Erro ao carregar calendários: ' + e.message);
             }
+        }
+    };
+
+    const handleSaveLink = async (calendarId, link) => {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('No user found');
+
+            const { data: clinic } = await supabase
+                .from('clinics')
+                .select('id')
+                .eq('owner_id', user.id)
+                .single();
+
+            if (!clinic) throw new Error('Clinic not found');
+
+            const calendar = calendars.find(c => c.id === calendarId);
+
+            // Upsert agenda in Supabase
+            const { error } = await supabase
+                .from('agendas')
+                .upsert({
+                    clinic_id: clinic.id,
+                    google_calendar_id: calendarId,
+                    name: calendar.summary,
+                    appointment_link: link,
+                    is_active: true
+                }, {
+                    onConflict: 'google_calendar_id'
+                });
+
+            if (error) {
+                console.error('Supabase Error saving link:', error);
+                throw error;
+            }
+
+            await fetchCalendars(); // Refresh to update state
+        } catch (error) {
+            console.error('Error saving link:', error);
+            alert(`Erro ao salvar link: ${error.message || 'Erro desconhecido'}`);
+            throw error;
         }
     };
 
@@ -358,6 +510,27 @@ const AgendaPage = () => {
                 throw new Error(error.error?.message || 'Erro ao criar agenda');
             }
 
+            const newCal = await res.json();
+
+            // Also create in Supabase to track it
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data: clinic } = await supabase
+                    .from('clinics')
+                    .select('id')
+                    .eq('owner_id', user.id)
+                    .single();
+
+                if (clinic) {
+                    await supabase.from('agendas').insert({
+                        clinic_id: clinic.id,
+                        google_calendar_id: newCal.id,
+                        name: name,
+                        is_active: true
+                    });
+                }
+            }
+
             await fetchCalendars();
             alert('Agenda criada com sucesso!');
         } finally {
@@ -403,8 +576,28 @@ const AgendaPage = () => {
         return `${start.getDate()} - ${end.getDate()} de ${new Intl.DateTimeFormat('pt-BR', { month: 'short' }).format(end)}`;
     };
 
+    // Mobile Logic
+    const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            const mobile = window.innerWidth < 768;
+            setIsMobile(mobile);
+            if (mobile) {
+                setSidebarOpen(false);
+            } else {
+                setSidebarOpen(true);
+            }
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
     return (
-        <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden">
+        <div className="flex h-screen bg-slate-950 text-slate-100 overflow-hidden relative">
             <EventModal
                 isOpen={isEventModalOpen}
                 onClose={() => { setIsEventModalOpen(false); setEditingEvent(null); }}
@@ -421,22 +614,67 @@ const AgendaPage = () => {
                 onSave={handleCreateCalendar}
             />
 
+            <CalendarLinkModal
+                isOpen={isLinkModalOpen}
+                onClose={() => { setIsLinkModalOpen(false); setSelectedCalendarForLink(null); }}
+                calendar={selectedCalendarForLink}
+                onSave={handleSaveLink}
+            />
+
+            <SettingsModal
+                isOpen={isSettingsModalOpen}
+                onClose={() => setIsSettingsModalOpen(false)}
+                calendar={calendars.find(c => c.id === selectedCalendar)}
+                onLink={(cal) => {
+                    setSelectedCalendarForLink(cal);
+                    setIsLinkModalOpen(true);
+                }}
+                onRename={handleRenameCalendar}
+                onDelete={handleDeleteCalendar}
+            />
+
+            {/* Mobile Sidebar Backdrop */}
+            {isMobile && sidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+                    onClick={() => setSidebarOpen(false)}
+                />
+            )}
+
             {/* Sidebar */}
             <motion.div
                 initial={false}
-                animate={{ width: sidebarOpen ? 300 : 0, opacity: sidebarOpen ? 1 : 0 }}
-                className="bg-slate-900 border-r border-slate-800 flex-shrink-0 flex flex-col overflow-hidden"
+                animate={{
+                    width: sidebarOpen ? (isMobile ? '100%' : 340) : 0,
+                    opacity: sidebarOpen ? 1 : 0,
+                    x: sidebarOpen ? 0 : (isMobile ? -100 : 0) // Slide effect on mobile check
+                }}
+                className={`flex-shrink-0 flex flex-col overflow-hidden bg-slate-900 border-r border-slate-800 ${isMobile ? 'fixed inset-y-0 left-0 z-50 h-full shadow-2xl' : 'relative h-full'
+                    }`}
             >
-                <div className="p-6 min-w-[300px]">
-                    <div className="flex items-center gap-3 mb-8">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
-                            <CalendarIcon className="w-6 h-6 text-white" />
+                <div className={`p-6 ${isMobile ? 'w-screen' : 'min-w-[340px]'}`}>
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
+                                <CalendarIcon className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                                <h1 className="font-bold text-xl leading-tight">Minha Agenda</h1>
+                                <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Profissional</p>
+                            </div>
                         </div>
-                        <div>
-                            <h1 className="font-bold text-lg leading-tight">Minha Agenda</h1>
-                            <p className="text-xs text-slate-500 font-medium uppercase tracking-wider">Profissional</p>
-                        </div>
+                        {isMobile && (
+                            <button
+                                onClick={() => setSidebarOpen(false)}
+                                className="p-2 bg-slate-800 rounded-lg text-slate-400"
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        )}
                     </div>
+                    {/* ... Rest of Sidebar content ... */}
 
                     {/* Google Calendar Connect Button - shown when provider_token is missing */}
                     {needsGoogleConnect && (
@@ -452,8 +690,8 @@ const AgendaPage = () => {
                                     </p>
                                 </div>
                             </div>
-                            <a
-                                href="/conexao-agenda"
+                            <Link
+                                to="/dashboard/integracoes"
                                 className="w-full py-2.5 px-4 bg-yellow-500 hover:bg-yellow-400 text-slate-900 rounded-lg font-semibold text-sm transition-all flex items-center justify-center gap-2"
                             >
                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
@@ -463,7 +701,7 @@ const AgendaPage = () => {
                                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                                 </svg>
                                 Conectar agora
-                            </a>
+                            </Link>
                         </div>
                     )}
 
@@ -473,77 +711,83 @@ const AgendaPage = () => {
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setIsCalendarModalOpen(true)}
                         disabled={needsGoogleConnect}
-                        className={`w-full mb-6 py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-xl font-bold shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2 ${needsGoogleConnect ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`w-full mb-8 py-3.5 px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white rounded-xl font-bold shadow-lg shadow-blue-600/20 transition-all flex items-center justify-center gap-2 ${needsGoogleConnect ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                         <Plus className="w-5 h-5" />
-                        Nova Agenda
+                        <span className="text-sm">Nova Agenda</span>
                     </motion.button>
 
                     <div>
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Calendários</h3>
+                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest pl-2">Calendários</h3>
                         </div>
-                        <div className="space-y-1">
+                        <div className="space-y-2">
                             {calendars.map(cal => {
                                 const isSelected = selectedCalendar === cal.id;
                                 return (
                                     <div key={cal.id} className="group relative">
                                         <motion.button
                                             onClick={() => setSelectedCalendar(cal.id)}
-                                            whileHover={{ x: 4 }}
-                                            whileTap={{ scale: 0.98 }}
-                                            className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${isSelected
-                                                ? 'bg-slate-800 shadow-lg shadow-slate-900/50'
-                                                : 'hover:bg-slate-800/50'
+                                            className={`w-full flex items-center gap-3 p-3 pr-28 rounded-xl transition-all border ${isSelected
+                                                ? 'bg-slate-800 border-slate-700 shadow-md'
+                                                : 'bg-transparent border-transparent hover:bg-slate-800/40'
                                                 }`}
                                         >
                                             <div
-                                                className="w-3 h-3 rounded-full flex-shrink-0 shadow-lg"
-                                                style={{ backgroundColor: cal.backgroundColor || '#3b82f6' }}
+                                                className={`w-3 h-3 rounded-full flex-shrink-0 shadow-sm ring-2 ${isSelected ? 'ring-offset-2 ring-offset-slate-800' : 'ring-transparent'}`}
+                                                style={{
+                                                    backgroundColor: cal.backgroundColor || '#3b82f6',
+                                                    boxShadow: `0 0 8px ${cal.backgroundColor}66`
+                                                }}
                                             />
                                             <span className={`text-sm font-medium flex-1 text-left truncate ${isSelected ? 'text-white' : 'text-slate-400'
                                                 }`}>
                                                 {cal.summary}
                                             </span>
-                                            {isSelected && (
-                                                <motion.div
-                                                    layoutId="selected-indicator"
-                                                    className="w-2 h-2 rounded-full bg-blue-500"
-                                                />
-                                            )}
                                         </motion.button>
 
-                                        {/* Edit/Delete buttons - always visible with helpful tooltips */}
-                                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 z-20">
+                                        {/* Action Buttons - Always Visible & Vibrant */}
+                                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5 z-20">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedCalendarForLink(cal);
+                                                    setIsLinkModalOpen(true);
+                                                }}
+                                                className={`p-1.5 rounded-lg transition-all shadow-sm hover:scale-105 ${cal.appointment_link
+                                                    ? 'bg-blue-600 text-white shadow-blue-900/20'
+                                                    : 'bg-slate-700 text-slate-400 hover:bg-blue-600 hover:text-white'
+                                                    }`}
+                                                title={cal.appointment_link ? "Link configurado" : "Configurar link"}
+                                            >
+                                                <LinkIcon className="w-3.5 h-3.5" />
+                                            </button>
+
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleRenameCalendar(cal.id);
                                                 }}
-                                                className="p-1.5 bg-slate-900 hover:bg-blue-600 rounded-lg transition-colors shadow-lg"
-                                                title="Renomear calendário"
+                                                className="p-1.5 bg-indigo-600/10 text-indigo-400 hover:bg-indigo-600 hover:text-white rounded-lg transition-all border border-indigo-500/20 hover:border-indigo-500 shadow-sm hover:scale-105"
+                                                title="Renomear"
                                             >
-                                                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                                 </svg>
                                             </button>
+
                                             {!cal.primary && (
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         handleDeleteCalendar(cal.id);
                                                     }}
-                                                    disabled={isDeletingCalendar === cal.id}
-                                                    className="p-1.5 bg-slate-900 hover:bg-red-600 rounded-lg transition-colors shadow-lg disabled:opacity-50 disabled:cursor-wait"
-                                                    title={isDeletingCalendar === cal.id ? "Deletando..." : "Deletar calendário"}
+                                                    className="p-1.5 bg-red-600/10 text-red-400 hover:bg-red-600 hover:text-white rounded-lg transition-all border border-red-500/20 hover:border-red-500 shadow-sm hover:scale-105"
+                                                    title="Excluir"
                                                 >
-                                                    {isDeletingCalendar === cal.id ? (
-                                                        <div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" />
-                                                    ) : (
-                                                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                        </svg>
-                                                    )}
+                                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
                                                 </button>
                                             )}
                                         </div>
@@ -558,7 +802,7 @@ const AgendaPage = () => {
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0 bg-slate-950">
                 {/* Toolbar */}
-                <div className="h-16 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-900/50 backdrop-blur-sm z-10">
+                <div className="h-16 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-900/50 backdrop-blur-sm z-20 relative">
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -573,7 +817,23 @@ const AgendaPage = () => {
                             <p className="text-xs text-slate-500 font-medium">
                                 Semana: {getWeekRange()}
                             </p>
+
                         </div>
+                    </div>
+
+                    {/* Selected Calendar Name - Desktop Centered */}
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:block">
+                        {selectedCalendar && (
+                            <div className="flex items-center gap-2 px-4 py-1.5 bg-slate-800/50 rounded-full border border-slate-800">
+                                <div
+                                    className="w-2 h-2 md:w-2.5 md:h-2.5 rounded-full shrink-0"
+                                    style={{ backgroundColor: getCalendarColor() }}
+                                />
+                                <span className="text-xs md:text-sm font-semibold text-slate-200 truncate">
+                                    {calendars.find(c => c.id === selectedCalendar)?.summary}
+                                </span>
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-3">
@@ -587,7 +847,7 @@ const AgendaPage = () => {
                             </button>
                             <button
                                 onClick={() => setCurrentDate(new Date())}
-                                className="px-4 py-2 text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-700 transition-colors border-x border-slate-700"
+                                className="hidden md:block px-4 py-2 text-sm font-semibold text-slate-300 hover:text-white hover:bg-slate-700 transition-colors border-x border-slate-700"
                             >
                                 Esta Semana
                             </button>
@@ -606,39 +866,70 @@ const AgendaPage = () => {
                         >
                             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
                         </button>
+
+                        {/* Settings Button */}
+                        <button
+                            onClick={() => setIsSettingsModalOpen(true)}
+                            className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-all"
+                            title="Configurações"
+                        >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
-                {/* Week Grid */}
-                <div className="flex-1 flex flex-col overflow-hidden">
-                    {/* Days Header */}
-                    <div className="grid border-b border-slate-800 bg-slate-900" style={{ gridTemplateColumns: '64px repeat(7, 1fr)' }}>
-                        <div></div>
-                        {weekDays.map((d, i) => (
+                {/* Mobile Context Strip - New Dedicated Bar */}
+                {selectedCalendar && (
+                    <div className="md:hidden px-4 py-2 bg-slate-900 border-b border-slate-800 flex items-center justify-between shadow-sm z-10 relative">
+                        <div className="flex items-center gap-2">
                             <div
-                                key={i}
-                                className={`py-2 text-center border-r border-slate-800/30 ${isToday(d) ? 'bg-gradient-to-b from-blue-500/10 to-transparent' : ''
-                                    }`}
-                            >
-                                <div className={`text-[10px] uppercase font-bold mb-1 ${isToday(d) ? 'text-blue-400' : 'text-slate-500'
-                                    }`}>
-                                    {d.toLocaleDateString('pt-BR', { weekday: 'short' })}
-                                </div>
-                                <div className={`text-xl font-bold ${isToday(d) ? 'text-blue-400' : 'text-slate-300'
-                                    }`}>
-                                    {d.getDate()}
-                                </div>
-                            </div>
-                        ))}
+                                className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.5)]"
+                                style={{ backgroundColor: getCalendarColor() }}
+                            />
+                            <span className="text-xs font-bold text-slate-200 uppercase tracking-wide">
+                                {calendars.find(c => c.id === selectedCalendar)?.summary}
+                            </span>
+                        </div>
+                        <div className="text-[10px] text-slate-500 font-medium bg-slate-800 px-2 py-1 rounded">
+                            {getWeekRange()}
+                        </div>
                     </div>
+                )}
 
-                    {/* Scrollable Grid */}
-                    <div ref={scrollRef} className="flex-1 overflow-y-auto relative" style={{ scrollbarGutter: 'stable' }}>
+                {/* Week Grid - Refactored for alignment */}
+                <div ref={scrollRef} className="flex-1 overflow-y-auto relative bg-slate-950" style={{ scrollbarGutter: 'stable' }}>
+                    <div className="min-w-[800px]"> {/* Ensure min width for horizontal scroll if needed */}
+
+                        {/* Interactive Header (Days) - Sticky Top */}
+                        <div className="grid sticky top-0 z-30 border-b border-slate-800 bg-slate-900 shadow-sm" style={{ gridTemplateColumns: '64px repeat(7, 1fr)' }}>
+                            <div className="sticky left-0 bg-slate-900 z-40 border-r border-slate-800"></div> {/* Corner */}
+                            {weekDays.map((d, i) => (
+                                <div
+                                    key={i}
+                                    className={`py-3 text-center border-r border-slate-800/30 ${isToday(d) ? 'bg-gradient-to-b from-blue-500/10 to-transparent' : ''
+                                        }`}
+                                >
+                                    <div className={`text-[10px] uppercase font-bold mb-1 ${isToday(d) ? 'text-blue-400' : 'text-slate-500'
+                                        }`}>
+                                        {d.toLocaleDateString('pt-BR', { weekday: 'short' })}
+                                    </div>
+                                    <div className={`text-xl font-bold ${isToday(d) ? 'text-blue-400' : 'text-slate-300'
+                                        }`}>
+                                        {d.getDate()}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Grid Body used to be here, now merged into the same scroll context flow */}
                         <div className="grid relative" style={{ gridTemplateColumns: '64px repeat(7, 1fr)', minHeight: '1440px' }}>
-                            {/* Time Column */}
-                            <div className="border-r border-slate-800 bg-slate-900/50 text-[10px] text-slate-500 font-medium sticky left-0 z-10">
+                            {/* Time Column - Sticky Left */}
+                            <div className="border-r border-slate-800 bg-slate-900/95 text-[10px] text-slate-500 font-medium sticky left-0 z-20">
                                 {Array.from({ length: 24 }).map((_, h) => (
-                                    <div key={h} className="h-[60px] border-b border-slate-800/30 text-center pt-1">
+                                    <div key={h} className="h-[60px] border-b border-slate-800/30 text-center pt-1 bg-slate-900/95">
                                         {h}:00
                                     </div>
                                 ))}
@@ -666,7 +957,7 @@ const AgendaPage = () => {
                                         {/* Current Time Line */}
                                         {isToday(date) && (
                                             <div
-                                                className="absolute w-full h-0.5 bg-red-500 z-30"
+                                                className="absolute w-full h-0.5 bg-red-500 z-10 pointer-events-none"
                                                 style={{
                                                     top: `${(new Date().getHours() * 60 + new Date().getMinutes()) / (24 * 60) * 100}%`
                                                 }}
@@ -688,6 +979,7 @@ const AgendaPage = () => {
                                                 const top = (startMin / 1440) * 100;
                                                 const height = ((endMin - startMin) / 1440) * 100;
 
+                                                // Event Card Rendering
                                                 return (
                                                     <motion.div
                                                         key={event.id}
@@ -697,48 +989,56 @@ const AgendaPage = () => {
                                                         whileHover={{
                                                             scale: 1.02,
                                                             zIndex: 50,
-                                                            boxShadow: '0 8px 24px rgba(0,0,0,0.3)'
+                                                            boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
                                                         }}
-                                                        onClick={() => openEventInGoogle(event)}
-                                                        className="absolute inset-x-1 rounded-lg p-2 border overflow-hidden cursor-pointer group bg-slate-800/90 border-slate-700 hover:bg-slate-700 transition-all"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            // If mobile, simple tap opens, maybe preventing hover issues
+                                                            openEventInGoogle(event);
+                                                        }}
+                                                        className="absolute inset-x-0.5 md:inset-x-1 rounded-md md:rounded-lg p-1 md:p-2 border overflow-hidden cursor-pointer group bg-slate-800/90 border-slate-700 hover:bg-slate-700 transition-all flex flex-col justify-start min-h-[50px] md:min-h-0"
                                                         style={{
                                                             top: `${top}%`,
-                                                            height: `${Math.max(height, 3)}%`,
+                                                            height: `${Math.max(height, 4)}%`, // Increased min-height for visibility
                                                             borderLeftWidth: '3px',
                                                             borderLeftColor: getCalendarColor()
                                                         }}
                                                     >
-                                                        <div className="flex justify-between items-start gap-2">
-                                                            <div className="flex-1 min-w-0">
-                                                                <h4 className="text-xs font-bold text-white leading-tight truncate mb-0.5">
-                                                                    {event.summary || '(Sem título)'}
-                                                                </h4>
-                                                                <p className="text-[10px] text-slate-400 font-medium flex items-center gap-1">
-                                                                    <Clock className="w-3 h-3" />
+                                                        <div className="flex-1 w-full min-w-0 flex flex-col pt-0.5">
+                                                            {/* Time - Moved to Top for clear visibility on mobile */}
+                                                            <p className="text-[9px] md:text-[10px] text-slate-400 font-bold flex items-center gap-1 mb-0.5 leading-none">
+                                                                <Clock className="w-2.5 h-2.5 shrink-0 hidden md:block" />
+                                                                <span className="truncate">
                                                                     {start.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                                </span>
+                                                            </p>
+
+                                                            {/* Title - Multiline enabled */}
+                                                            <h4 className="text-[10px] md:text-xs font-bold text-white leading-3 md:leading-tight line-clamp-2 md:line-clamp-2 break-words">
+                                                                {event.summary || '(Sem título)'}
+                                                            </h4>
+
+                                                            {/* Location - Hidden on very small events or mobile if crowded */}
+                                                            {event.location && height > 2 && (
+                                                                <p className="hidden md:flex text-[9px] md:text-[10px] text-slate-500 items-center gap-1 truncate mt-0.5">
+                                                                    <MapPin className="w-2.5 h-2.5 shrink-0" />
+                                                                    <span className="truncate">{event.location}</span>
                                                                 </p>
-                                                                {event.location && (
-                                                                    <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5 truncate">
-                                                                        {event.location.includes('meet.google.com') ? (
-                                                                            <Video className="w-3 h-3" />
-                                                                        ) : (
-                                                                            <MapPin className="w-3 h-3" />
-                                                                        )}
-                                                                        <span className="truncate">{event.location}</span>
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    setEditingEvent(event);
-                                                                    setIsEventModalOpen(true);
-                                                                }}
-                                                                className="opacity-0 group-hover:opacity-100 p-1 bg-slate-900 hover:bg-blue-600 rounded transition-all"
-                                                            >
-                                                                <ExternalLink className="w-3 h-3" />
-                                                            </button>
+                                                            )}
                                                         </div>
+
+                                                        {/* Edit Button - Mobile friendly positioning */}
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setEditingEvent(event);
+                                                                setIsEventModalOpen(true);
+                                                            }}
+                                                            className="absolute top-1 right-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 p-1 text-slate-500 hover:text-white transition-all z-20"
+                                                            title="Editar detalhes"
+                                                        >
+                                                            <ExternalLink className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                                                        </button>
                                                     </motion.div>
                                                 );
                                             })}
@@ -749,17 +1049,17 @@ const AgendaPage = () => {
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* FAB - Floating Action Button */}
-            <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => { setEditingEvent(null); setIsEventModalOpen(true); }}
-                className="fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-full shadow-2xl shadow-blue-600/40 flex items-center justify-center hover:shadow-blue-600/60 transition-all z-50"
-            >
-                <Plus className="w-8 h-8" />
-            </motion.button>
+                {/* FAB - Floating Action Button - Hidden on Mobile */}
+                <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => { setEditingEvent(null); setIsEventModalOpen(true); }}
+                    className="hidden md:flex fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-full shadow-2xl shadow-blue-600/40 items-center justify-center hover:shadow-blue-600/60 transition-all z-50"
+                >
+                    <Plus className="w-8 h-8" />
+                </motion.button>
+            </div>
         </div>
     );
 };
