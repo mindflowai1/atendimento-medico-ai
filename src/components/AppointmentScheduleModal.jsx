@@ -128,13 +128,13 @@ const AppointmentScheduleModal = ({ isOpen, onClose, initialData = null, onSave,
                                         )}
                                         {formData.schedule_name || 'Novo Agendamento'}
                                     </span>
-                                    <div className="flex gap-2 mt-2">
-                                        <div className={`h-1.5 w-8 rounded-full transition-colors ${step >= 1 ? 'bg-blue-600' : 'bg-slate-200'}`} />
-                                        <div className={`h-1.5 w-8 rounded-full transition-colors ${step >= 2 ? 'bg-blue-600' : 'bg-slate-200'}`} />
-                                        {formData.schedule_type === 'internal' && (
+                                    {formData.schedule_type === 'internal' && (
+                                        <div className="flex gap-2 mt-2">
+                                            <div className={`h-1.5 w-8 rounded-full transition-colors ${step >= 1 ? 'bg-blue-600' : 'bg-slate-200'}`} />
+                                            <div className={`h-1.5 w-8 rounded-full transition-colors ${step >= 2 ? 'bg-blue-600' : 'bg-slate-200'}`} />
                                             <div className={`h-1.5 w-8 rounded-full transition-colors ${step >= 3 ? 'bg-blue-600' : 'bg-slate-200'}`} />
-                                        )}
-                                    </div>
+                                        </div>
+                                    )}
                                 </div>
                                 <button onClick={onClose} className="text-slate-400 hover:text-slate-800 transition-colors p-2 rounded-full hover:bg-slate-50">
                                     <X className="w-6 h-6" />
@@ -150,18 +150,11 @@ const AppointmentScheduleModal = ({ isOpen, onClose, initialData = null, onSave,
                                             setFormData={setFormData}
                                         />
                                     )}
-                                    {step === 2 && (
-                                        formData.schedule_type === 'internal' ? (
-                                            <StepTwoAvailability
-                                                formData={formData}
-                                                setFormData={setFormData}
-                                            />
-                                        ) : (
-                                            <StepExternalLink
-                                                formData={formData}
-                                                setFormData={setFormData}
-                                            />
-                                        )
+                                    {step === 2 && formData.schedule_type === 'internal' && (
+                                        <StepTwoAvailability
+                                            formData={formData}
+                                            setFormData={setFormData}
+                                        />
                                     )}
                                     {step === 3 && formData.schedule_type === 'internal' && (
                                         <StepThreeForm
@@ -182,10 +175,10 @@ const AppointmentScheduleModal = ({ isOpen, onClose, initialData = null, onSave,
                                 </button>
 
                                 <div className="flex gap-3">
-                                    {(step === 1 || (step === 2 && formData.schedule_type === 'internal')) ? (
+                                    {(step === 1 && formData.schedule_type === 'internal') || (step === 2 && formData.schedule_type === 'internal') ? (
                                         <button
                                             onClick={handleNext}
-                                            className="px-8 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-medium shadow-lg shadow-slate-900/10 transition-all flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0"
+                                            className="px-8 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-medium shadow-lg shadow-lg shadow-slate-900/10 transition-all flex items-center gap-2 hover:-translate-y-0.5 active:translate-y-0"
                                         >
                                             Continuar <ChevronRight className="w-4 h-4" />
                                         </button>
@@ -265,6 +258,20 @@ const StepOneBasic = ({ formData, setFormData }) => (
                     autoFocus
                 />
             </div>
+
+            {formData.schedule_type === 'external_google' && (
+                <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">Link da Página de Agendamento Google</label>
+                    <input
+                        type="url"
+                        value={formData.external_link || ''}
+                        onChange={e => setFormData({ ...formData, external_link: e.target.value })}
+                        placeholder="https://calendar.app.google/..."
+                        className="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-blue-500 focus:bg-white outline-none transition-all placeholder:text-slate-400"
+                    />
+                    <p className="text-xs text-slate-500 mt-2">Cole o link completo da sua página de agendamento do Google Calendar.</p>
+                </div>
+            )}
 
             {formData.schedule_type === 'internal' && (
                 <div className="grid grid-cols-2 gap-4">
@@ -377,33 +384,6 @@ const StepTwoAvailability = ({ formData, setFormData }) => {
         </div>
     );
 };
-
-const StepExternalLink = ({ formData, setFormData }) => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-8 text-center">
-            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm text-blue-600">
-                <Globe className="w-8 h-8" />
-            </div>
-            <h3 className="text-lg font-bold text-slate-800 mb-2">Link do Google Appointment</h3>
-            <p className="text-sm text-slate-600 mb-6 max-w-md mx-auto">
-                No Google Calendar, vá em "Create" > "Appointment schedule", configure sua agenda e cole o link gerado abaixo.
-            </p>
-
-            <div className="max-w-lg mx-auto relative">
-                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                    <svg className="w-5 h-5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                </div>
-                <input
-                    type="url"
-                    value={formData.external_link || ''}
-                    onChange={e => setFormData({ ...formData, external_link: e.target.value })}
-                    placeholder="https://calendar.app.google/..."
-                    className="w-full pl-10 pr-4 py-3 bg-white border border-slate-300 rounded-lg text-slate-800 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all shadow-sm"
-                />
-            </div>
-        </div>
-    </div>
-);
 
 const StepThreeForm = ({ formData, setFormData }) => (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
